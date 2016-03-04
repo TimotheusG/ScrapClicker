@@ -7,6 +7,13 @@ var __extends = this.__extends || function (d, b) {
 var Resource = (function () {
     function Resource() {
     }
+    Resource.prototype.display = function () {
+        if (this.amount - Math.floor(this.amount) > 0) {
+            return this.amount.toFixed(2);
+        }
+        else
+            return this.amount.toString();
+    };
     return Resource;
 })();
 var Scrap = (function (_super) {
@@ -27,6 +34,7 @@ var Rat = (function (_super) {
         this.amount = amount;
         this.name = "rat";
         this.cost = 10; //eventually make a resource cost class for validation
+        this.value = 1;
         document.getElementById('ratLbl').innerHTML = this.name + ": ";
     }
     return Rat;
@@ -37,8 +45,8 @@ var curRat = new Rat(0);
 resourceList["scrap"] = curScrap;
 resourceList["rat"] = curRat;
 function updateView() {
-    document.getElementById('scrapId').innerHTML = resourceList["scrap"].amount.toString();
-    document.getElementById('ratId').innerHTML = resourceList["rat"].amount.toString();
+    document.getElementById('scrapId').innerHTML = resourceList["scrap"].display();
+    document.getElementById('ratId').innerHTML = resourceList["rat"].display();
     if (resourceList["scrap"].amount >= resourceList["rat"].cost) {
         document.getElementById('scrapRat').disabled = false;
     }
@@ -46,9 +54,12 @@ function updateView() {
         document.getElementById('scrapRat').disabled = true;
     }
 }
+function updateValues() {
+    if (resourceList["rat"].amount > 0)
+        resourceList["scrap"].amount += (resourceList["rat"].value * resourceList["rat"].amount) / 10;
+}
 function collectScrap() {
     resourceList["scrap"].amount += 1;
-    updateView();
 }
 function scrapRat() {
     //cost
@@ -57,6 +68,9 @@ function scrapRat() {
     resourceList["rat"].amount += 1;
     //update cost
     resourceList["rat"].cost *= 1.12;
-    updateView();
 }
+window.setInterval(function () {
+    this.updateValues();
+    updateView();
+}, 100);
 //# sourceMappingURL=game.js.map
