@@ -1,7 +1,7 @@
 class Resource {
     name: string;
     amount : number;
-    cost: number;
+    cost: Cost;
     value: number;
     display() : string
     {
@@ -14,11 +14,21 @@ class Resource {
     }
 }
 
+class Cost {
+    costList: { [id: string] : number; } = {};
+    constructor(res:string[], cost:number[]){
+
+        for (var i = 0; i < res.length; i++) {
+            this.costList[res[i]] = cost[i];
+        }
+    }
+}
+
 class Scrap extends Resource {
     constructor(public amount) {
         super();
         this.name = "scrap";
-        this.cost = 0;
+        this.cost = new Cost([""],[0]);
         document.getElementById('scrapLbl').innerHTML = this.name + ": ";
     }
 }
@@ -27,23 +37,36 @@ class Rat extends Resource {
     constructor(public amount) {
         super();
         this.name = "rat";
-        this.cost = 10; //eventually make a resource cost class for validation
+        this.cost = new Cost(["scrap"],[10]);
         this.value = 1;
         document.getElementById('ratLbl').innerHTML = this.name + ": ";
+    }
+}
+
+class wRat extends Resource {
+    constructor(public amount) {
+        super();
+        this.name = "wrat";
+        this.cost = new Cost(["scrap", "rat"],[10, 1]);
+        this.value = 1;
+        document.getElementById('wratLbl').innerHTML = this.name + ": ";
     }
 }
 
 var resourceList: { [id: string] : Resource; } = {};
 var curScrap = new Scrap(0);
 var curRat = new Rat(0);
+var curWRat = new wRat(0);
 resourceList["scrap"] = curScrap;
 resourceList["rat"] = curRat;
+resourceList["wrat"] = curWRat;
 
 function updateView()
 {
     document.getElementById('scrapId').innerHTML = resourceList["scrap"].display();
     document.getElementById('ratId').innerHTML = resourceList["rat"].display();
-    if(resourceList["scrap"].amount >= resourceList["rat"].cost)
+    document.getElementById('wratId').innerHTML = resourceList["wrat"].display();
+    if(resourceList["scrap"].amount >= resourceList["rat"].cost.costList["scrap"])
     {
         document.getElementById('scrapRat').disabled = false;
     }
@@ -51,6 +74,15 @@ function updateView()
     {
         document.getElementById('scrapRat').disabled = true;
     }
+    if(resourceList["scrap"].amount >= resourceList["wrat"].cost.costList["scrap"] && resourceList["rat"].amount >= resourceList["wrat"].cost.costList["rat"]) //condense this with a compare function on Cost/resourceList
+    {
+        document.getElementById('wRat').disabled = false;
+    }
+    else
+    {
+        document.getElementById('wRat').disabled = true;
+    }
+    document.getElementById('ratId').title = resourceList["rat"].cost.toString(); // doesn't work yet
 }
 
 function updateValues()
@@ -67,14 +99,27 @@ function collectScrap()
 function scrapRat()
 {
     //cost
-    resourceList["scrap"].amount -= resourceList["rat"].cost;
+    resourceList["scrap"].amount -= resourceList["rat"].cost.costList["scrap"];
     //create
     resourceList["rat"].amount += 1;
     //update cost
-    resourceList["rat"].cost *= 1.12;
+    resourceList["rat"].cost.costList["scrap"] *= 1.12;
+}
+
+function wScrapRat()
+{
+    //cost
+    resourceList["scrap"].amount -= resourceList["wrat"].cost.costList["scrap"];
+    resourceList["rat"].amount -= resourceList["wrat"].cost.costList["rat"];
+    //create
+    resourceList["wrat"].amount += 1;
+    //update cost
+    resourceList["wrat"].cost.costList["scrap"] *= 1.12;
+    resourceList["wrat"].cost.costList["rat"] *= 1.12;
 }
 
 window.setInterval(function(){
     this.updateValues();
     updateView();
 }, 100);
+

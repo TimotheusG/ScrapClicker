@@ -3,18 +3,27 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Typescript: Hello</title>
-
+    <title>Scrap Clicker</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+    <script src="js/jquery-2.2.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
 </head>
 <body>
 
-<label id="scrapLbl"></label> <span id="scrapId">0</span>
-<label id="ratLbl"></label> <span id="ratId">0</span>
+<label id="scrapLbl" ></label> <span id="scrapId">0</span>
+<label id="ratLbl" ></label> <span id="ratId">0</span>
+<label id="wratLbl" ></label> <span id="wratId">0</span>
 <div>
-    <button onclick="collectScrap()">collect scrap</button>
-    <button onclick="scrapRat()" id="scrapRat" disabled>scrap rat</button>
+    <button title="Free" data-toggle="popover" data-trigger="hover" data-content="Dig!" class="btn btn-lg btn-primary" onclick="collectScrap()">collect scrap</button>
+    <button title="10 Scrap" data-toggle="popover" data-trigger="hover" data-content="Strap some scrap to a rat, now you've got a Scrap-Rat!" class="btn btn-lg btn-primary" onclick="scrapRat()" id="scrapRat" disabled>scrap rat</button>
+    <button title="10 Scrap, 1 rat" data-toggle="popover" data-trigger="hover" data-content="Strap some scrap to a Scrap-Rat, now you've got a Flying-Scrap-Rat!" class="btn btn-lg btn-primary" onclick="wScrapRat()" id="wRat" disabled>Winged scrap rat</button>
+
 </div>
 <script src="game.js"></script>
-
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();
+    });
+</script>
 </body>
 </html>
