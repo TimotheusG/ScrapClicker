@@ -16,22 +16,15 @@ var Resource = (function () {
     };
     return Resource;
 })();
-var Cost = (function () {
-    function Cost(res, cost) {
-        this.costList = {};
-        for (var i = 0; i < res.length; i++) {
-            this.costList[res[i]] = cost[i];
-        }
-    }
-    return Cost;
-})();
 var Scrap = (function (_super) {
     __extends(Scrap, _super);
     function Scrap(amount) {
         _super.call(this);
         this.amount = amount;
         this.name = "scrap";
-        this.cost = new Cost([""], [0]);
+        this.cost = {
+            "scrap": 0
+        };
         document.getElementById('scrapLbl').innerHTML = this.name + ": ";
     }
     return Scrap;
@@ -42,7 +35,9 @@ var Rat = (function (_super) {
         _super.call(this);
         this.amount = amount;
         this.name = "rat";
-        this.cost = new Cost(["scrap"], [10]);
+        this.cost = {
+            "scrap": 10
+        };
         this.value = 1;
         document.getElementById('ratLbl').innerHTML = this.name + ": ";
     }
@@ -54,7 +49,10 @@ var wRat = (function (_super) {
         _super.call(this);
         this.amount = amount;
         this.name = "wrat";
-        this.cost = new Cost(["scrap", "rat"], [10, 1]);
+        this.cost = {
+            "scrap": 10,
+            "rat": 1
+        };
         this.value = 1;
         document.getElementById('wratLbl').innerHTML = this.name + ": ";
     }
@@ -71,13 +69,13 @@ function updateView() {
     document.getElementById('scrapId').innerHTML = resourceList["scrap"].display();
     document.getElementById('ratId').innerHTML = resourceList["rat"].display();
     document.getElementById('wratId').innerHTML = resourceList["wrat"].display();
-    if (resourceList["scrap"].amount >= resourceList["rat"].cost.costList["scrap"]) {
+    if (resourceList["scrap"].amount >= resourceList["rat"].cost["scrap"]) {
         document.getElementById('scrapRat').disabled = false;
     }
     else {
         document.getElementById('scrapRat').disabled = true;
     }
-    if (resourceList["scrap"].amount >= resourceList["wrat"].cost.costList["scrap"] && resourceList["rat"].amount >= resourceList["wrat"].cost.costList["rat"]) {
+    if (resourceList["scrap"].amount >= resourceList["wrat"].cost["scrap"] && resourceList["rat"].amount >= resourceList["wrat"].cost["rat"]) {
         document.getElementById('wRat').disabled = false;
     }
     else {
@@ -94,21 +92,21 @@ function collectScrap() {
 }
 function scrapRat() {
     //cost
-    resourceList["scrap"].amount -= resourceList["rat"].cost.costList["scrap"];
+    resourceList["scrap"].amount -= resourceList["rat"].cost["scrap"];
     //create
     resourceList["rat"].amount += 1;
     //update cost
-    resourceList["rat"].cost.costList["scrap"] *= 1.12;
+    resourceList["rat"].cost["scrap"] *= 1.12;
 }
 function wScrapRat() {
     //cost
-    resourceList["scrap"].amount -= resourceList["wrat"].cost.costList["scrap"];
-    resourceList["rat"].amount -= resourceList["wrat"].cost.costList["rat"];
+    resourceList["scrap"].amount -= resourceList["wrat"].cost["scrap"];
+    resourceList["rat"].amount -= resourceList["wrat"].cost["rat"];
     //create
     resourceList["wrat"].amount += 1;
     //update cost
-    resourceList["wrat"].cost.costList["scrap"] *= 1.12;
-    resourceList["wrat"].cost.costList["rat"] *= 1.12;
+    resourceList["wrat"].cost["scrap"] *= 1.12;
+    resourceList["wrat"].cost["rat"] *= 1.12;
 }
 window.setInterval(function () {
     this.updateValues();
